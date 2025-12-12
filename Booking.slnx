@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Booking.API/Booking.API.csproj" />
+    <Project Path="src/Booking.Application/Booking.Application.csproj" />
+    <Project Path="src/Booking.Domain/Booking.Domain.csproj" />
+    <Project Path="src/Booking.Infrastructure/Booking.Infrastructure.csproj" />
+    <Project Path="src/Booking.Persistence/Booking.Persistence.csproj" />
+  </Folder>
+</Solution>
