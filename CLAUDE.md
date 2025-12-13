@@ -34,9 +34,10 @@ Booking.API/            → REST API controllers, dependency injection setup
 
 All aggregates extend `AggregateRoot<TId>` which provides domain event management. Each aggregate uses strongly-typed IDs (readonly record structs).
 
-1. **Tenant** - Business owner (badminton yard, spa, consultant)
-   - Has `TimeZone` (IANA format, e.g., "Asia/Ho_Chi_Minh")
+1. **Provider** - Business/person offering services on the platform (badminton court owner, spa owner, consultant)
+   - Has `TimeZone` (IANA format, e.g., "America/New_York")
    - Has unique `Slug` for URL-friendly identification
+   - Registers their business to offer bookable services
 
 2. **Service** - Bookable offering (court, massage, consultation)
    - `BookingMode` enum: Direct | StaffBased
@@ -69,7 +70,7 @@ All aggregates extend `AggregateRoot<TId>` which provides domain event managemen
 
 ### Value Objects
 
-- **Strongly-Typed IDs**: `TenantId`, `ServiceId`, `StaffId`, `CustomerId`, `BookingId` (all `readonly record struct` wrapping `Guid`)
+- **Strongly-Typed IDs**: `ProviderId`, `ServiceId`, `StaffId`, `CustomerId`, `BookingId` (all `readonly record struct` wrapping `Guid`)
 - **WeeklySchedule**: Dictionary<DayOfWeek, WorkingHours?>
 - **WorkingHours**: StartTime, EndTime (TimeOnly)
 
@@ -165,7 +166,7 @@ The repository structure and base domain classes are established. Key files exis
 1. **Staff Optionality**: Never assume staff exists - always check `StaffId.HasValue` on Booking
 2. **Schedule Location**: Direct mode services have schedules; StaffBased services don't (staff have them)
 3. **MaxConcurrentBookings**: Only applies to Direct mode (courts, rooms, group classes)
-4. **Timezone Handling**: All tenants have timezone - use it for date/time calculations
+4. **Timezone Handling**: All providers have timezone - use it for date/time calculations
 5. **Snapshot Immutability**: Booking snapshots (ServiceName, ServicePrice, StaffName) should never update after creation
 
 ## Technology Stack
