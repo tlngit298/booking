@@ -11,12 +11,12 @@ public enum BookingStatus
     Pending = 1,
 
     /// <summary>
-    /// Booking has been confirmed by the tenant/system.
+    /// Booking has been confirmed by the provider/system.
     /// </summary>
     Confirmed = 2,
 
     /// <summary>
-    /// Booking has been cancelled by customer or tenant.
+    /// Booking has been cancelled by customer or provider.
     /// </summary>
     Cancelled = 3,
 
