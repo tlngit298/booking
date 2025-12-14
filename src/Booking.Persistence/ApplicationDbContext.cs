@@ -9,7 +9,8 @@ public class ApplicationDbContext : DbContext
     {
     }
 
-    // DbSets will be added later (Provider, Service, Staff, Customer, Booking)
+    // DbSets
+    public DbSet<Provider> Providers => Set<Provider>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

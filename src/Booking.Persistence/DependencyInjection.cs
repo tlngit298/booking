@@ -1,5 +1,6 @@
 using Booking.Application.Common;
 using Booking.Persistence;
+using Booking.Persistence.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -19,5 +20,7 @@ public static class DependencyInjection
         // Register UnitOfWork
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+        // Register repositories
+        builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
     }
 }
