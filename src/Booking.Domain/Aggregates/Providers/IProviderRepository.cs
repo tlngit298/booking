@@ -14,4 +14,12 @@ public interface IProviderRepository : IRepository<Provider, ProviderId>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The provider if found; otherwise, null.</returns>
     Task<Provider?> GetBySlugAsync(string slug, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Checks if a slug already exists.
+    /// </summary>
+    /// <param name="slug">The slug to check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the slug exists; otherwise, false.</returns>
+    Task<bool> SlugExistsAsync(string slug, CancellationToken cancellationToken = default);
 }
