@@ -106,8 +106,8 @@ public sealed class Provider : AggregateRoot<ProviderId>
         string? phone = null)
     {
         // Validate optional fields
-        if (!string.IsNullOrWhiteSpace(description) && description.Length > 2000)
-            throw new DomainException("Description must not exceed 2000 characters");
+        if (!string.IsNullOrWhiteSpace(description) && description.Length > 1000)
+            throw new DomainException("Description must not exceed 1000 characters");
 
         if (!string.IsNullOrWhiteSpace(phone) && phone.Length > 20)
             throw new DomainException("Phone must not exceed 20 characters");
@@ -155,7 +155,7 @@ public sealed class Provider : AggregateRoot<ProviderId>
     {
         // Validate optional fields
         if (!string.IsNullOrWhiteSpace(description) && description.Length > 1000)
-            throw new DomainException("Description must not exceed 2000 characters");
+            throw new DomainException("Description must not exceed 1000 characters");
 
         if (!string.IsNullOrWhiteSpace(phone) && phone.Length > 20)
             throw new DomainException("Phone must not exceed 20 characters");
