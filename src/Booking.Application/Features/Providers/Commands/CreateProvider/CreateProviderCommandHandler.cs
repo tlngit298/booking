@@ -22,23 +22,14 @@ public sealed class CreateProviderCommandHandler
                 Error.Conflict("Provider.SlugExists", "A provider with this slug already exists"));
         }
 
-        // Create domain entity
+        // Create domain entity with all fields at once
         var provider = Provider.Create(
             request.Name,
             request.Slug,
             request.Email,
-            request.TimeZone);
-
-        // Apply optional fields
-        if (!string.IsNullOrWhiteSpace(request.Description) ||
-            !string.IsNullOrWhiteSpace(request.Phone))
-        {
-            provider.Update(
-                request.Name,
-                request.Description,
-                request.Email,
-                request.Phone);
-        }
+            request.TimeZone,
+            request.Description,
+            request.Phone);
 
         // Persist
         await _providerRepository.AddAsync(provider, cancellationToken);

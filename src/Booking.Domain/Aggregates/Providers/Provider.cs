@@ -1,4 +1,5 @@
 using Booking.Domain.Common;
+using Booking.Domain.Aggregates.Providers.ValueObjects;
 
 namespace Booking.Domain.Aggregates.Providers;
 
@@ -11,12 +12,12 @@ public sealed class Provider : AggregateRoot<ProviderId>
     /// <summary>
     /// Gets the provider's business name.
     /// </summary>
-    public string Name { get; private set; } = null!;
+    public ProviderName Name { get; private set; } = null!;
 
     /// <summary>
     /// Gets the URL-friendly unique identifier for the provider.
     /// </summary>
-    public string Slug { get; private set; } = null!;
+    public Slug Slug { get; private set; } = null!;
 
     /// <summary>
     /// Gets the provider's business description.
@@ -26,7 +27,7 @@ public sealed class Provider : AggregateRoot<ProviderId>
     /// <summary>
     /// Gets the provider's contact email.
     /// </summary>
-    public string Email { get; private set; } = null!;
+    public Email Email { get; private set; } = null!;
 
     /// <summary>
     /// Gets the provider's contact phone number.
@@ -36,7 +37,7 @@ public sealed class Provider : AggregateRoot<ProviderId>
     /// <summary>
     /// Gets the provider's timezone (IANA format, e.g., "Asia/Ho_Chi_Minh").
     /// </summary>
-    public string TimeZone { get; private set; } = null!;
+    public ValueObjects.TimeZone TimeZone { get; private set; } = null!;
 
     /// <summary>
     /// Gets whether the provider is active.
@@ -61,25 +62,59 @@ public sealed class Provider : AggregateRoot<ProviderId>
         string email,
         string timeZone)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Provider name is required");
+        var provider = new Provider
+        {
+            Id = ProviderId.New(),
+            Name = ProviderName.Create(name),
+            Slug = Slug.Create(slug),
+            Email = Email.Create(email),
+            TimeZone = ValueObjects.TimeZone.Create(timeZone),
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
 
-        if (string.IsNullOrWhiteSpace(slug))
-            throw new DomainException("Provider slug is required");
+        // Domain event will be added in future implementation
+        // provider.AddDomainEvent(new ProviderCreatedEvent(provider.Id, name, slug));
 
-        if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Provider email is required");
+        return provider;
+    }
 
-        if (string.IsNullOrWhiteSpace(timeZone))
-            throw new DomainException("Provider timezone is required");
+    /// <summary>
+    /// Creates a new provider with optional fields.
+    /// </summary>
+    /// <param name="name">The provider's business name.</param>
+    /// <param name="slug">The URL-friendly unique identifier.</param>
+    /// <param name="email">The provider's contact email.</param>
+    /// <param name="timeZone">The provider's timezone (IANA format).</param>
+    /// <param name="description">The provider's business description (optional).</param>
+    /// <param name="phone">The provider's contact phone (optional).</param>
+    /// <returns>A new Provider instance.</returns>
+    /// <exception cref="DomainException">Thrown when validation fails.</exception>
+    public static Provider Create(
+        string name,
+        string slug,
+        string email,
+        string timeZone,
+        string? description = null,
+        string? phone = null)
+    {
+        // Validate optional fields
+        if (!string.IsNullOrWhiteSpace(description) && description.Length > 2000)
+            throw new DomainException("Description must not exceed 2000 characters");
+
+        if (!string.IsNullOrWhiteSpace(phone) && phone.Length > 20)
+            throw new DomainException("Phone must not exceed 20 characters");
 
         var provider = new Provider
         {
             Id = ProviderId.New(),
-            Name = name,
-            Slug = slug,
-            Email = email,
-            TimeZone = timeZone,
+            Name = ProviderName.Create(name),
+            Slug = Slug.Create(slug),
+            Email = Email.Create(email),
+            TimeZone = ValueObjects.TimeZone.Create(timeZone),
+            Description = description,
+            Phone = phone,
             IsActive = true,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -105,15 +140,16 @@ public sealed class Provider : AggregateRoot<ProviderId>
         string email,
         string? phone)
     {
-        if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("Provider name is required");
+        // Validate optional fields
+        if (!string.IsNullOrWhiteSpace(description) && description.Length > 1000)
+            throw new DomainException("Description must not exceed 2000 characters");
 
-        if (string.IsNullOrWhiteSpace(email))
-            throw new DomainException("Provider email is required");
+        if (!string.IsNullOrWhiteSpace(phone) && phone.Length > 20)
+            throw new DomainException("Phone must not exceed 20 characters");
 
-        Name = name;
+        Name = ProviderName.Create(name);
         Description = description;
-        Email = email;
+        Email = Email.Create(email);
         Phone = phone;
         UpdatedAt = DateTime.UtcNow;
     }

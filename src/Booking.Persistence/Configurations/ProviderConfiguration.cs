@@ -1,3 +1,5 @@
+using Booking.Domain.Aggregates.Providers.ValueObjects;
+
 namespace Booking.Persistence.Configurations;
 
 public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
@@ -17,20 +19,32 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
                 value => new ProviderId(value))  // From database: Guid → ProviderId
             .ValueGeneratedNever();       // We generate IDs in domain (ProviderId.New())
 
-        // Required fields with max lengths
+        // Value object conversions for required fields
         builder.Property(p => p.Name)
+            .HasConversion(
+                name => name.Value,
+                value => ProviderName.Create(value))
             .IsRequired()
             .HasMaxLength(200);
 
         builder.Property(p => p.Slug)
+            .HasConversion(
+                slug => slug.Value,
+                value => Slug.Create(value))
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(100);
 
         builder.Property(p => p.Email)
+            .HasConversion(
+                email => email.Value,
+                value => Email.Create(value))
             .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(p => p.TimeZone)
+            .HasConversion(
+                tz => tz.Value,
+                value => Booking.Domain.Aggregates.Providers.ValueObjects.TimeZone.Create(value))
             .IsRequired()
             .HasMaxLength(100);
 
