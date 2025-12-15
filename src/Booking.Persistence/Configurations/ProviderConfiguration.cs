@@ -36,7 +36,7 @@ public class ProviderConfiguration : IEntityTypeConfiguration<Provider>
 
         // Optional fields
         builder.Property(p => p.Description)
-            .HasMaxLength(2000);
+            .HasMaxLength(1000);
 
         builder.Property(p => p.Phone)
             .HasMaxLength(50);
