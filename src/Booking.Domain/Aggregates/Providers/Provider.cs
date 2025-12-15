@@ -1,5 +1,6 @@
 using Booking.Domain.Common;
 using Booking.Domain.Aggregates.Providers.ValueObjects;
+using Booking.Domain.Aggregates.Providers.Events;
 
 namespace Booking.Domain.Aggregates.Providers;
 
@@ -74,8 +75,13 @@ public sealed class Provider : AggregateRoot<ProviderId>
             UpdatedAt = DateTime.UtcNow
         };
 
-        // Domain event will be added in future implementation
-        // provider.AddDomainEvent(new ProviderCreatedEvent(provider.Id, name, slug));
+        // Raise domain event after aggregate creation
+        provider.AddDomainEvent(new ProviderCreatedEvent(
+            provider.Id,
+            provider.Name.Value,
+            provider.Slug.Value,
+            provider.Email.Value,
+            provider.TimeZone.Value));
 
         return provider;
     }
@@ -120,8 +126,15 @@ public sealed class Provider : AggregateRoot<ProviderId>
             UpdatedAt = DateTime.UtcNow
         };
 
-        // Domain event will be added in future implementation
-        // provider.AddDomainEvent(new ProviderCreatedEvent(provider.Id, name, slug));
+        // Raise domain event with all optional fields
+        provider.AddDomainEvent(new ProviderCreatedEvent(
+            provider.Id,
+            provider.Name.Value,
+            provider.Slug.Value,
+            provider.Email.Value,
+            provider.TimeZone.Value,
+            provider.Description,
+            provider.Phone));
 
         return provider;
     }
