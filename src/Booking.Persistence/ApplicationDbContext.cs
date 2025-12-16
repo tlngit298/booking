@@ -23,7 +23,7 @@ public class ApplicationDbContext : DbContext
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         // Update audit fields automatically
-        UpdateAuditableEntities();
+        // UpdateAuditableEntities();
 
         return await base.SaveChangesAsync(cancellationToken);
     }
