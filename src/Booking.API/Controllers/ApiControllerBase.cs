@@ -88,6 +88,7 @@ public abstract class ApiControllerBase : ControllerBase
             _ when error.Code.Contains("NotFound") => StatusCodes.Status404NotFound,
             _ when error.Code.Contains("Validation") => StatusCodes.Status400BadRequest,
             _ when error.Code.Contains("Conflict") => StatusCodes.Status409Conflict,
+            _ when error.Code.Contains("Exists") => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
     }
