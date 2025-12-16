@@ -5,6 +5,7 @@ using Booking.Application.Features.Providers.Commands.UpdateProvider;
 using Booking.Application.Features.Providers.Queries.GetProviderById;
 using Booking.Application.Features.Providers.Queries.GetProviderBySlug;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Booking.API.Controllers;
@@ -14,6 +15,7 @@ namespace Booking.API.Controllers;
 /// Demonstrates the ApiResponse pattern with various CQRS operations.
 /// </summary>
 [Tags("Providers")]
+[Authorize]
 public class ProvidersController : ApiControllerBase
 {
     private readonly ISender _sender;

@@ -1,4 +1,6 @@
 using Booking.API.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Reflection;
 
@@ -9,6 +11,23 @@ builder.AddApplicationServices();
 builder.AddPersistenceServices();
 
 builder.Services.AddControllers();
+
+// Add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(
+        options =>
+        {
+            options.Authority = "http://localhost:8080/realms/booking";
+            options.RequireHttpsMetadata = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = "http://localhost:8080/realms/booking",
+                ValidateAudience = true,
+                ValidAudience = "net-api"
+            };
+        }
+    );
 
 // Configure Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
@@ -78,6 +97,7 @@ app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
