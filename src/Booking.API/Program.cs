@@ -30,38 +30,44 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     );
 
 // Configure Swagger/OpenAPI
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddOpenApi("v1", options =>
 {
-    // API Information
-    options.SwaggerDoc("v1", new OpenApiInfo
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
     {
-        Title = "Booking API",
-        Version = "v1",
-        Description = "RESTful API for the Booking platform - a service booking system built with Clean Architecture and DDD principles",
-        Contact = new OpenApiContact
+        // Ensure instances exist
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+
+        
+        
+        // Add OAuth2 security scheme (Authorization Code flow only)
+        document.Components.SecuritySchemes.Add("Bearer", new OpenApiSecurityScheme
         {
-            Name = "Booking API Support",
-            Email = "lenguyentuan3298@gmail.com"
-        },
-        License = new OpenApiLicense
-        {
-            Name = "MIT",
-            Url = new Uri("https://opensource.org/licenses/MIT")
-        }
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+        });
+
+        // Apply security requirement globally
+        document.Security = [
+            new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecuritySchemeReference("Bearer"),
+                    []
+                }
+            }
+        ];
+        
+        // Set the host document for all elements
+        // including the security scheme references
+        document.SetReferenceHostDocument();
+
+        return Task.CompletedTask;
     });
-
-    // Include XML documentation
-    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFilename);
-    options.IncludeXmlComments(xmlPath);
-
-    // Customize schema IDs to use full type names (avoids conflicts)
-    options.CustomSchemaIds(type => type.FullName);
-
-    // Support for polymorphism and inheritance
-    options.UseAllOfForInheritance();
-    options.UseOneOfForPolymorphism();
 });
 
 // Register global exception handler
@@ -69,27 +75,16 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 var app = builder.Build();
+app.MapOpenApi();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    // Enable Swagger JSON endpoint
-    app.UseSwagger();
-
-    // Enable Swagger UI
     app.UseSwaggerUI(options =>
     {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Booking API v1");
-        options.RoutePrefix = "swagger"; // Access at /swagger
-
-        // UI Enhancements
-        options.DocumentTitle = "Booking API - Swagger UI";
-        options.DisplayOperationId();
-        options.DisplayRequestDuration();
-        options.EnableDeepLinking();
-        options.EnableFilter();
-        options.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.List);
-        options.DefaultModelsExpandDepth(1);
+        // options.RoutePrefix = "swagger";
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+        options.OAuthUsePkce();
     });
 }
 
