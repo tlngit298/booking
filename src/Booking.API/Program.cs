@@ -1,10 +1,23 @@
 using Booking.API.Middleware;
+using Booking.Infrastructure.HealthChecks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddHttpClient();
+builder.Services.AddHealthChecks()
+    .AddNpgSql(
+        builder.Configuration.GetConnectionString("DefaultConnection")!,
+        name: "postgresql",
+        tags: new[] { "db", "postgres", "ready" }
+    )
+    .AddCheck<KeycloakHealthCheck>(
+        "keycloak",
+        tags: new[] { "auth", "keycloak", "ready" }
+    );
 
 // Add services to the container.
 builder.AddApplicationServices();
@@ -76,6 +89,33 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 app.MapOpenApi();
+app.MapHealthChecks("/healthz", new HealthCheckOptions
+{
+    ResponseWriter = async (context, report) => 
+    {
+        context.Response.ContentType = "application/json";
+        await context.Response.WriteAsJsonAsync(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(entry => new
+            {
+                name = entry.Key,
+                status = entry.Value.Status.ToString(),
+                exception = entry.Value.Exception?.Message,
+                description = entry.Value.Description,
+                duration = entry.Value.Duration.ToString()
+            })
+        });
+    }
+});
+app.MapHealthChecks("/healthz/live", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("live")
+});
+app.MapHealthChecks("/healthz/ready", new HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready")
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
